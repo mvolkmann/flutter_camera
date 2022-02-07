@@ -67,13 +67,10 @@ class _HomeState extends State<Home> {
   }
 
   void takePhoto() {
-    Navigator.of(context)
-        .push(
-      MaterialPageRoute(builder: (_) => CameraScreen(camera: widget.camera!)),
-    )
-        .then((filePath) {
-      setState(() => _imageFilePath = filePath);
-    });
+    var route = CameraScreen(camera: widget.camera!);
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => route)).then(
+          (filePath) => setState(() => _imageFilePath = filePath),
+        );
   }
 }
 
@@ -133,6 +130,7 @@ class CameraScreenState extends State<CameraScreen> {
 
           final image = await _controller.takePicture();
 
+          // Return to previous route, passing it the path to the image.
           Navigator.pop(context, image.path);
         } catch (e) {
           print('error: $e');
