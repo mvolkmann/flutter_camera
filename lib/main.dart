@@ -111,6 +111,7 @@ class PhotoScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Photo')),
       // The image is stored as a file on the device.
+      //TODO: Where does the image get its size?
       body: Image.file(File(imagePath)),
     );
   }
