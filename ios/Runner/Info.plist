@@ -25,7 +25,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Explanation on why the camera access is needed.</string>
+	<string>Camera access is needed to demonstrate the "camera" library.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access is needed to demonstrate the "image_picker" library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access is needed to demonstrate the "image_picker" library.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

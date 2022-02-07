@@ -4,6 +4,14 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+const title = 'Camera / Photo Library Demo';
+
+Future<void> navigateTo(BuildContext context, Widget page) {
+  return Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => page),
+  );
+}
+
 Future<void> main() async {
   // Ensure that plugin services are initialized so
   // availableCameras can be called before runApp.
@@ -12,24 +20,48 @@ Future<void> main() async {
   // Get a list of the available cameras on the device.
   // This might include front and rear facing cameras.
   final cameras = await availableCameras();
-  print('main.dart main: cameras = $cameras');
 
   final firstCamera = cameras.isEmpty ? null : cameras.first;
-  print('main.dart main: firstCamera = $firstCamera');
-
-  var body = firstCamera == null
-      ? Scaffold(
-          appBar: AppBar(title: const Text('Camera Error')),
-          body: Text('No camera found.'),
-        )
-      : CameraScreen(camera: firstCamera);
 
   runApp(
     MaterialApp(
       theme: ThemeData.light(),
-      home: body,
+      title: title,
+      home: Home(camera: firstCamera),
     ),
   );
+}
+
+class Home extends StatelessWidget {
+  final CameraDescription? camera;
+
+  Home({required this.camera, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text(title)),
+      body: Row(
+        children: [
+          if (camera == null) const Text('No camera found.'),
+          if (camera != null)
+            ElevatedButton(
+              child: const Text('Take Photo'),
+              onPressed: () {
+                navigateTo(context, CameraScreen(camera: camera!));
+              },
+            ),
+          ElevatedButton(
+            child: const Text('Select Photo'),
+            onPressed: () {
+              print('main.dart Select Photo onPressed: entered');
+              //navigateTo(context, PhotoScreen(imagePath: image.path));
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class CameraScreen extends StatefulWidget {
@@ -88,11 +120,7 @@ class CameraScreenState extends State<CameraScreen> {
 
           final image = await _controller.takePicture();
 
-          await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => PhotoScreen(imagePath: image.path),
-            ),
-          );
+          await navigateTo(context, PhotoScreen(imagePath: image.path));
         } catch (e) {
           print('error: $e');
         }
