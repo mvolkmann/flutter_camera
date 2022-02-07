@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
-import './extensions/widget_extensions.dart';
 
 const title = 'Camera / Photo Library Demo';
 
@@ -34,57 +32,35 @@ Future<void> main() async {
   );
 }
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   final CameraDescription? camera;
 
   Home({required this.camera, Key? key}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  final _picker = ImagePicker();
-  XFile? _selectedXFile;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text(title)),
-      body: Column(
+      body: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.camera == null) const Text('No camera found.'),
-              if (widget.camera != null)
-                ElevatedButton(
-                  child: const Text('Take Photo'),
-                  onPressed: () {
-                    navigateTo(context, CameraScreen(camera: widget.camera!));
-                  },
-                ),
-              ElevatedButton(
-                child: const Text('Select Photo'),
-                onPressed: pickImage,
-              ),
-            ],
-          ).gap(10),
-          if (_selectedXFile != null) Text('Name: ${_selectedXFile!.name}'),
-          if (_selectedXFile != null)
-            CircleAvatar(
-              backgroundImage: FileImage(File(_selectedXFile!.path)),
-              radius: 100,
+          if (camera == null) const Text('No camera found.'),
+          if (camera != null)
+            ElevatedButton(
+              child: const Text('Take Photo'),
+              onPressed: () {
+                navigateTo(context, CameraScreen(camera: camera!));
+              },
             ),
-          //if (_selectedXFile != null) Image.file(File(_selectedXFile!.path)),
+          ElevatedButton(
+            child: const Text('Select Photo'),
+            onPressed: () {
+              print('main.dart Select Photo onPressed: entered');
+              //navigateTo(context, PhotoScreen(imagePath: image.path));
+            },
+          ),
         ],
       ),
     );
-  }
-
-  void pickImage() async {
-    XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    setState(() => _selectedXFile = image);
   }
 }
 
@@ -144,7 +120,7 @@ class CameraScreenState extends State<CameraScreen> {
 
           final image = await _controller.takePicture();
 
-          await navigateTo(context, PhotoScreen(selectedXFile: image.path));
+          await navigateTo(context, PhotoScreen(imagePath: image.path));
         } catch (e) {
           print('error: $e');
         }
@@ -154,9 +130,9 @@ class CameraScreenState extends State<CameraScreen> {
 }
 
 class PhotoScreen extends StatelessWidget {
-  final String selectedXFile;
+  final String imagePath;
 
-  const PhotoScreen({required this.selectedXFile, Key? key}) : super(key: key);
+  const PhotoScreen({required this.imagePath, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +140,7 @@ class PhotoScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Photo')),
       // The image is stored as a file on the device.
       //TODO: Where does the image get its size?
-      body: Image.file(File(selectedXFile)),
+      body: Image.file(File(imagePath)),
     );
   }
 }
