@@ -1,16 +1,11 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import './extensions/widget_extensions.dart';
 
 const title = 'Camera / Photo Library Demo';
-
-Future<void> navigateTo(BuildContext context, Widget page) {
-  return Navigator.of(context).push(
-    MaterialPageRoute(builder: (_) => page),
-  );
-}
 
 Future<void> main() async {
   // Ensure that plugin services are initialized so
@@ -32,32 +27,45 @@ Future<void> main() async {
   );
 }
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   final CameraDescription? camera;
 
   Home({required this.camera, Key? key}) : super(key: key);
 
   @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String? imageFilePath;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text(title)),
-      body: Row(
+      body: Column(
         children: [
-          if (camera == null) const Text('No camera found.'),
-          if (camera != null)
-            ElevatedButton(
-              child: const Text('Take Photo'),
-              onPressed: () {
-                navigateTo(context, CameraScreen(camera: camera!));
-              },
-            ),
-          ElevatedButton(
-            child: const Text('Select Photo'),
-            onPressed: () {
-              print('main.dart Select Photo onPressed: entered');
-              //navigateTo(context, PhotoScreen(imagePath: image.path));
-            },
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (widget.camera == null) const Text('No camera found.'),
+              if (widget.camera != null)
+                ElevatedButton(
+                  child: const Text('Take Photo'),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(
+                      MaterialPageRoute(
+                          builder: (_) => CameraScreen(camera: widget.camera!)),
+                    )
+                        .then((filePath) {
+                      setState(() => imageFilePath = filePath);
+                    });
+                  },
+                ),
+            ],
+          ).gap(10),
+          if (imageFilePath != null) Image.file(File(imageFilePath!)),
         ],
       ),
     );
@@ -120,27 +128,11 @@ class CameraScreenState extends State<CameraScreen> {
 
           final image = await _controller.takePicture();
 
-          await navigateTo(context, PhotoScreen(imagePath: image.path));
+          Navigator.pop(context, image.path);
         } catch (e) {
           print('error: $e');
         }
       },
-    );
-  }
-}
-
-class PhotoScreen extends StatelessWidget {
-  final String imagePath;
-
-  const PhotoScreen({required this.imagePath, Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Photo')),
-      // The image is stored as a file on the device.
-      //TODO: Where does the image get its size?
-      body: Image.file(File(imagePath)),
     );
   }
 }
