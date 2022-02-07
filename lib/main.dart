@@ -4,8 +4,6 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-const title = 'Camera Demo';
-
 Future<void> main() async {
   // Ensure that plugin services are initialized so
   // availableCameras can be called before runApp.
@@ -20,18 +18,16 @@ Future<void> main() async {
   print('main.dart main: firstCamera = $firstCamera');
 
   var body = firstCamera == null
-      ? Text('No camera found.')
+      ? Scaffold(
+          appBar: AppBar(title: const Text('Camera Error')),
+          body: Text('No camera found.'),
+        )
       : CameraScreen(camera: firstCamera);
 
   runApp(
     MaterialApp(
       theme: ThemeData.light(),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-        ),
-        body: body,
-      ),
+      home: body,
     ),
   );
 }
@@ -73,8 +69,7 @@ class CameraScreenState extends State<CameraScreen> {
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
-          var done = snapshot.connectionState == ConnectionState.done;
-          return done
+          return snapshot.connectionState == ConnectionState.done
               ? CameraPreview(_controller)
               : const Center(child: CircularProgressIndicator());
         },
@@ -95,9 +90,7 @@ class CameraScreenState extends State<CameraScreen> {
 
           await Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => PhotoScreen(
-                imagePath: image.path,
-              ),
+              builder: (_) => PhotoScreen(imagePath: image.path),
             ),
           );
         } catch (e) {
