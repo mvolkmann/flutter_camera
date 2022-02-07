@@ -71,7 +71,12 @@ class _HomeState extends State<Home> {
             ],
           ).gap(10),
           if (_selectedXFile != null) Text('Name: ${_selectedXFile!.name}'),
-          if (_selectedXFile != null) Image.file(File(_selectedXFile!.path)),
+          if (_selectedXFile != null)
+            CircleAvatar(
+              backgroundImage: FileImage(File(_selectedXFile!.path)),
+              radius: 100,
+            ),
+          //if (_selectedXFile != null) Image.file(File(_selectedXFile!.path)),
         ],
       ),
     );
