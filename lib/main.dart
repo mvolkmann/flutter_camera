@@ -37,7 +37,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String? imageFilePath;
+  String? _imageFilePath;
 
   @override
   Widget build(BuildContext context) {
@@ -52,23 +52,28 @@ class _HomeState extends State<Home> {
               if (widget.camera != null)
                 ElevatedButton(
                   child: const Text('Take Photo'),
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(
-                      MaterialPageRoute(
-                          builder: (_) => CameraScreen(camera: widget.camera!)),
-                    )
-                        .then((filePath) {
-                      setState(() => imageFilePath = filePath);
-                    });
-                  },
+                  onPressed: takePhoto,
                 ),
             ],
           ).gap(10),
-          if (imageFilePath != null) Image.file(File(imageFilePath!)),
+          if (_imageFilePath != null)
+            CircleAvatar(
+              backgroundImage: FileImage(File(_imageFilePath!)),
+              radius: 100,
+            ),
         ],
       ),
     );
+  }
+
+  void takePhoto() {
+    Navigator.of(context)
+        .push(
+      MaterialPageRoute(builder: (_) => CameraScreen(camera: widget.camera!)),
+    )
+        .then((filePath) {
+      setState(() => _imageFilePath = filePath);
+    });
   }
 }
 
